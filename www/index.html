@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<!--[if IE 8 ]>    <html lang="ko" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="ko" class="no-js lt-ie9> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="ko" class="no-js">
+<!--<![endif]-->
+	<head>
+	    <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width" />
+	    <title>wholook-userapp</title>
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+       	
+       	<!-- bootstrap 3.0, jqueryMobile 1.4-->
+        <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="assets/plugins/jqm/jquery.mobile-1.4.0.min.css">
+		
+        
+        <link rel='stylesheet' href='assets/css/vendor/normalize.css'>
+	    <link rel='stylesheet' href='assets/css/vendor/fontello.css'>
+	    <link rel='stylesheet' href='assets/css/style.css'>
+	    <link rel='stylesheet' href='assets/css/custom.css'>
+		
+		<!-- wholook ui css -->
+		
+		<link rel="stylesheet" href="assets/plugins/wholook/css/wholook-ui.css">
+	  
+        <!-- Import GoogleWebFonts -->
+        <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,100,200,700,500' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700' rel='stylesheet' type='text/css'>
+        
+        <!-- Modernizr & HTML5 Shiv -->
+        
+        <script type="text/javascript" src='assets/js/vendor/modernizr.js'></script>
+        
+        
+        <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+        
+        <!-- Phonegap js import-->
+        
+        <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+        
+       
+        <script type="text/javascript" charset="utf-8" src="barcodescanner.js"></script>
+        
+		<!--[if lt IE 9]>
+		<script src='assets/js/vendor/html5shiv.js'></script>
+		<![endif]-->
+		
+		<script type="text/javascript">
+			
+			var Network_State = false;
+			var devicePlatform = '';
+				
+			function onLoad(){
+	        	
+	        	document.addEventListener("deviceready", onDeviceReady, true);
+	        	
+	        }
+			
+	
+			function onDeviceReady() {
+				// Register the event listener
+				console.log("==========폰갭이 준비중~~~~~");
+				document.addEventListener("offline", onOffline, false);
+				document.addEventListener("online", onOnline, false);
+				document.addEventListener("backbutton", onBackKeyDown, false);
+				document.addEventListener("pause", onPause, false);
+				document.addEventListener("resume", onResume, false);
+				document.addEventListener("menubutton", onMenuKeyDown, false);
+				
+				//navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
+				checkConnection();
+				
+	        	
+				console.log("=======================폰갭이 준비되었습니다.");
+				
+				startGUI();
+			}
+			
+			// 오프라인시 셋팅
+			function onOffline() {
+				console.log( "==onOffline");
+				Network_State = false;
+	    	}
+	    	
+	    	function onOnline() {
+	    		console.log( "==onOnline");
+	    		Network_State = true;
+	    	}
+	    	
+	    	function onBackEnd( buttonIndex )
+	    	{
+	    		if( buttonIndex == 1 ) appClose();	
+	    	}
+	    	// 기기상 백버튼 클릭시
+	    	function onBackKeyDown() {
+	    		
+	    		
+	    		if( $("#back_url").attr( "visibility") == "visible" )
+	    		{
+	    			click_back_btn();	
+	    		}else
+	    		{
+	    			navigator.notification.confirm(
+			            '앱을 종료 하시겠습니까?', // message
+			             onBackEnd,            // callback to invoke with index of button pressed
+			            'Game Over',           // title
+			            ['예','아니오']         // buttonLabels
+			        );	
+	    		}
+    			
+	    	}
+	
+	    	function onPause() {
+	    		alert("onPause");
+	    	}
+	    	
+	    	function onResume() {
+	    		alert("onResume");
+	    	}
+	    	
+	    	function onMenuKeyDown() {
+	    		//alert("onMenuKeyDown");	
+	    	}
+    		
+    		function getLocationSuccess( position ){
+    			var message = 'Latitude: '           + position.coords.latitude              + '\n' +
+                            'Longitude: '          + position.coords.longitude             + '\n' +
+                            'Altitude: '           + position.coords.altitude              + '\n' +
+                            'Accuracy: '           + position.coords.accuracy              + '\n' +
+                            'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '\n' +
+                            'Heading: '            + position.coords.heading               + '\n' +
+                            'Speed: '              + position.coords.speed                 + '\n' +
+                            'Timestamp: '          + position.timestamp                    + '\n';	
+                            
+                alert( message );
+                
+               
+    		}
+    		
+    		function getLocationonError( err ){
+    			alert(' getLocationonError code: '    + err.code    + '\n' +
+              'message: ' + err.message + '\n');
+    		}
+    		
+    		function checkConnection() {
+    			
+    			// 테스트시 제대로 동작하지 않음 Unknown connection 으로 읽어 오는 경우가 허다함
+    			
+    			var networkState = navigator.connection.type;		
+    			// cordova 2.3 before Connetion after navigator.connection
+    			
+	            var states = {};
+	            states[navigator.connection.UNKNOWN]  = 'Unknown connection';
+	            states[navigator.connection.ETHERNET] = 'Ethernet connection';
+	            states[navigator.connection.WIFI]     = 'WiFi connection';
+	            states[navigator.connection.CELL_2G]  = 'Cell 2G connection';
+	            states[navigator.connection.CELL_3G]  = 'Cell 3G connection';
+	            states[navigator.connection.CELL_4G]  = 'Cell 4G connection';
+	            states[navigator.connection.CELL]     = 'Cell generic connection';
+	            states[navigator.connection.NONE]     = 'No network connection';
+				
+				
+				console.log( "Network State=======" + states[networkState] );
+	            if( states[networkState] != 'No network connection' )
+	            	Network_State = true;
+	        }
+        
+    	//////////////////// event add end ///////////////////////
+			
+		</script>
+	    
+	</head>
+	<body class="touch-gesture" onload="onLoad()">
+        
+            
+   <!--
+    <div id="preloader" class="loader">
+        <div class="status">
+            
+        </div>
+    </div>
+   -->
+     
+    <!-- loader --> 
+    <div id="loading" class="loader" style="display:none;">
+        <div class="status_custom">
+        </div>
+    </div>
+    <!-- loader -->
+        
+        
+    <!-- Container -->
+    <div id="container">
+        
+        <!-- LEFT Menu -->
+        <aside id="sidemenu-container">
+        	<div id="sidemenu">
+        		
+	        	<nav id="nav-container">
+	        		<h1>
+	        		<ul class="nav">
+	        			<li><a href="#" style="color:white;">home - 매장리스트</a></li>
+	        			<li>
+	        				<a href="#" style="color:white;"> 단골 매장 - 후룩텔레콤</a>
+	        				<span class="nav-child-container">
+	        					<span class="nav-child-trigger">+</span>
+	        				</span>
+	        				<ul style="height: 0;">
+			        			<li><a href="#" style="color:white;">메세지</a></li>
+			        			<li><a href="#" style="color:white;">쿠폰</a></li>
+			        			<li><a href="#" style="color:white;">업무</a></li>
+	        				</ul>
+	        			</li>
+	        			<li><a href="index.html" style="color:white;">설정</a></li>
+	        		</ul>
+	        		</h1>
+	        	</nav>
+        	</div>
+        </aside>
+	<!-- =Sidebar -->
+
+         
+        <section id="content-container">
+            
+            <!-- 고정 Header --> 
+	        <header id="header">
+	        	
+	        	<div id="menu_all" class="header-button right icon-menu"></div>
+	        	<h1><a class='current'>W H O L O O K</a></h1>
+	        	<div id="back_url" class="header-button left icon-left" style="visibility:hidden;"></div>
+	      
+            </header>
+            <!-- 고정 Header -->
+            
+            <!-- Contents --> 
+			<div id="content" class="target blog">
+				
+            </div>
+	        <!-- Contents -->
+            
+            
+        </section>
+        <!--
+        <div class="clearfix">&nbsp;</div>
+        -->
+    <!-- Main Content -->
+    </div>
+      
+    <!-- =Container -->
+	
+
+
+   
+    <script>!window.jQuery && document.write('<script src="assets/js/vendor/jquery.js"><\/script>')</script>
+    
+	
+	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+	<script src="assets/plugins/jqm/jquery.mobile-1.4.0.min.js"></script>
+	
+	<!-- Custom Scripts -->
+    <script src='assets/js/plugins/klass.js'></script>
+    <script src='assets/js/plugins/photoswipe.js'></script>
+    <script src='assets/js/plugins/hammer.js'></script>
+    <script src='assets/js/plugins/flexslider.js'></script>
+    <script src='assets/js/plugins/h5validate.js'></script>
+    <script src='assets/js/plugins/responsivetables.js'></script>
+    <script src='assets/js/plugins/prism.js'></script>
+    <script src='assets/js/script.js'></script>
+		
+    <script src="assets/js/handlebars.runtime.js"></script>
+    <script src="assets/js/handlebars.js"></script>
+    
+    <!-- 템플릿 추가 -->
+    <script src="assets/templates/common/modalLoading.tmpl"></script>
+    <script src="assets/templates/common/modalConfirm.tmpl"></script>
+    <script src="assets/templates/common/modalLoadingCon.tmpl"></script>
+    <script src="assets/templates/register/identification.tmpl"></script>
+    <script src="assets/templates/register/setIdentificationNo.tmpl"></script>
+    <script src="assets/templates/register/lagacyAlert.tmpl"></script>
+    <script src="assets/templates/register/chooseShop.tmpl"></script>
+    
+    <script src="assets/templates/register/agreement.tmpl"></script>
+    <script src="assets/templates/register/shoplistInfo.tmpl"></script>
+    <script src="assets/templates/shop/shopInfo.tmpl"></script>
+   
+    
+	
+	<!-- import wholook js api -->
+	<script type="text/javascript" src="assets/plugins/wholook/js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="assets/plugins/wholook/js/cert/jsbn.js"></script>
+	<script type="text/javascript" src="assets/plugins/wholook/js/cert/prng4.js"></script>
+	<script type="text/javascript" src="assets/plugins/wholook/js/cert/rng.js"></script>
+	<script type="text/javascript" src="assets/plugins/wholook/js/cert/rsa.js"></script>
+	<script type="text/javascript" src="assets/plugins/wholook/js/crypto-js/aes.js"></script>
+	
+    
+    
+    <script type="text/javascript" src="assets/wholook-api/wholook-api.js"></script>
+    <script type="text/javascript" src="assets/wholook-api/wholook-mobile.js"></script>
+    
+    <script type="text/javascript" src="assets/wholook-api/wholookUserVo.js"></script>
+    
+    <script type="text/javascript" src="assets/wholook-api/wholook.js"></script>
+    
+    <!-- wholook-ui js import-->
+  	
+    <script type="text/javascript" src="assets/plugins/wholook/js/wholook-ui.js"></script>
+ 	<script type="text/javascript" src="assets/wholook-api/wholook-mobileUI.js"></script>
+ 	<!--<script type="text/javascript" src="assets/wholook-api/time_worker.js"></script>-->
+ 	
+ 	
+	
+	
+    <script type="text/javascript">
+             
+       	    
+        var back_action = '';
+        
+        
+        var userVo = new UserVo(); 
+		var template = null; 
+		var temlpate_data = null;
+		
+        var messageObj; 
+        var smsCount = 0;
+        var firstStepCount = 0;
+        
+        
+        
+    	function refresh_ui_list(){
+    		alert("업데이트중...");
+    	}
+    	
+    	
+		//el = 결과값 보여줄 element		
+		function scan( el ) {
+			
+	        cordova.plugins.barcodeScanner.scan(function(result) {
+	        	
+	        	el.val( result.text);
+	        	
+            }, function(error) {
+                alert("Scanning failed: " + error);
+            });
+	    }
+	    
+	    function encode(type, data) {
+	        cordova.plugins.barcodeScanner.encode(type, data, function(result) {
+	        s
+                alert("encode success: " + result);
+            }, function(error) {
+                alert("encoding failed: " + error);
+            });
+	    }
+    	
+		// 메인 툴바 액션 정의
+		function set_back_btn( btnState, action){
+			if( btnState )
+			{
+				$("#back_url").css("visibility","visible");	
+			}else
+			{
+				$("#back_url").css("visibility","hidden");
+			}
+			back_action = action;
+		}
+		// 메인 툴바에 백버튼 클릭 이벤트	
+		function click_back_btn(){
+
+			if( back_action == null || back_action == '' )
+			{
+				set_back_btn( false,'');	
+			}else
+			{
+				
+				switch ( back_action )
+				{
+					case 'LOGIN_AFTER' :
+						
+						logIn_after(getLocalGuestID()); 
+						break;
+					//case 'SHOP_INFO' : logIn_after(getLocalGuestID()); break;
+				}
+			}
+		}
+		
+		function startGUI() {           
+			
+			/*
+			devicePlatform = device.platform;
+			
+	        console.log( "devicePlatform====" + devicePlatform );
+	       	
+	       	var deviceInfo = 'Device Name: '     + device.name     + '/n' +
+                            'Device Model: '    + device.model    + '/n' +
+                            'Device Cordova: '  + device.cordova  + '/n' +
+                            'Device Platform: ' + device.platform + '/n' +
+                            'Device UUID: '     + device.uuid     + '/n' +
+                            'Device Version: '  + device.version  + '/n';
+	       	
+	       	
+	       	console.log( "deviceInfo====" + deviceInfo );
+	       	*/
+			setUpdateTimer(3000);
+			
+			set_back_btn(false,'');
+			
+			$("#back_url").bind( { click: function(){
+				click_back_btn();	
+			}});
+			
+
+    		setLoadingImgPath("../assets/images/spinner.gif"); 
+    		
+    		//test user sample data 생성
+    		removeGuestID();
+    		//setLocalGuestID( 2335 );
+    		
+    		if( getLocalGuestID() == null || getLocalGuestID() == '' )
+    		{//최초 사용자
+    			console.log( " 최초 사용자 ");
+    			if( !getNetworkState() )
+    			{//네트웍 연결 안된 사용자
+    				alert( "인터넷 연결후 재실행 하십시요!" );
+    				appClose();
+    			}else
+    			{
+    				//네트웍 연결 사용자
+    				wholookTLSHandshake(function() {
+    					console.log( " 핸드쉐이크 -> user_register ");
+    					user_register();		
+    				},function( error){
+    					alert( "암호화 가정중 에러 발생");
+    					appClose();	
+    				});		
+    			}
+    		}else//기존 사용자
+    		{
+    			if( !getNetworkState() )
+    			{
+    				//네트웍 연결 안된 사용자
+    				logIn_after( getLocalGuestID() );
+    			}else
+    			{
+    				//네트웍 연결 사용자
+    				wholookTLSHandshake(function() {
+    					user_LogIn( getLocalGuestID() );
+    				},function( error){
+    					alert( "암호화 가정중 에러 발생");
+    					appClose();	
+    				});
+    			}			
+    		}
+        } 
+        
+    </script>
+	</body>
+</html>

@@ -1,0 +1,11 @@
+(function() {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['identification'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div id=\"contents_center\" class=\"wrapped-content\">\n	<div class=\"txt-center\">\n		<h3 class=\"title txt-center\"><i class=\"icon-users\"></i>본 인 인 증</h3>\n	</div>\n	<hr>\n	<form id=\"frmID\" class=\"full-width\" action=\"\">\n		<input type=\"text\" name=\"phoneno\" id=\"phoneno\" placeholder=\"(-없이) 01012345678\" />\n		<div class=\"clearfix\"></div>\n		<input type=\"text\" name=\"name\" id=\"name\" placeholder=\"이름입력\" />\n		<div class=\"clearfix\"></div>\n		<a href=\"#\" id=\"btnSubmit\" class=\"button full-width\"><b>입력완료</b></a>\n	</form>\n</div>";
+  });
+})();

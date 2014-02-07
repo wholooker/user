@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="net.wholook.app.user" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Hello Cordova</name>
+    <description>
+        A sample Apache Cordova application that responds to the deviceready event.
+    </description>
+    <preference name="loglevel" value="DEBUG" />
+    <feature name="App">
+        <param name="android-package" value="org.apache.cordova.App" />
+    </feature>
+    <feature name="BarcodeScanner">
+        <param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner" />
+    </feature>
+    <name>wholookuser</name>
+    <description>
+        wholook is fun
+    </description>
+    <author email="help@wholook.net" href="http://wholook.net">
+        wholook Team
+    </author>
+    <content src="index.html" />
+    <access origin="http://dev.wholook.net" subdomains="true" />
+    <access origin="*" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="DisallowOverscroll" value="true" />
+    <feature name="debug-server" required="true">
+        <param name="domain" value="http://localhost:8080" />
+        <param name="key" value="net.wholook.app.user" />
+    </feature>
+</widget>

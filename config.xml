@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="net.wholook.app.user" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>wholookuser</name>
+    <description>
+        wholook is fun
+    </description>
+    <author email="help@wholook.net" href="http://wholook.net">
+        wholook Team
+    </author>
+    <content src="index.html" />
+    <access origin="http://dev.wholook.net" subdomains="true" />
+    <access origin="*" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="DisallowOverscroll" value="true"/>
+    
+    <feature name="debug-server" required="true">
+    	<param name="domain" value="http://localhost:8080"/>
+    	<param name="key" value="net.wholook.app.user"/>
+  	</feature>
+  
+<!--
+	<gap:plugin name="com.phonegap.plugins.barcodescanner" />
+    <preference name="SplashScreen" value="splash" />
+	<preference name="SplashScreenDelay" value="10000" />
+-->
+</widget>

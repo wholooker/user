@@ -1,0 +1,11 @@
+(function() {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['lagacyAlert'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div id=\"contents_center\" class=\"wrapped-content\">\n    <form id=\"frmLagacy\" class=\"full-width\" action=\"\">\n    <div class=\"txt-center\">\n        <h3 class=\"title txt-center\"><i class=\"icon-attention\"> </i>기존 사용이력 알림</h3>\n    </div>\n    <hr/>\n        \n        <article id=\"format-link\" class=\"format-link\" style=\"margin-bottom:-5px;\">\n            <p class=\"icon-bg icon-attention\"></p>\n            <div class=\"wrapped-content\">\n                    기존에 사용된 이력이 있는 전화번호 입니다.<br/>\n                    기존에 사용된 이력이 있는 전화번호 입니다.<br/>\n                    기존에 사용된 이력이 있는 전화번호 입니다.<br/>\n                    기존에 사용된 이력이 있는 전화번호 입니다.<br/>\n            </div>\n            <hr/>\n        </article>\n    \n        <a href=\"#\" id=\"btnNewRegister\" class=\"button full-width\"><i class=\"icon-user-1\"></i><b> 신규이용</b></a>\n        <a href=\"#\" id=\"btnLagacyUser\" class=\"button red full-width\"><i class=\"icon-mobile-1\"></i><b> 기존 데이터유지 + 매장인증요청</b></a>\n    </form>\n</div>";
+  });
+})();

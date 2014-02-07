@@ -1,0 +1,33 @@
+(function() {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['shoplistInfo'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n	                <li class=\"list-group-item\">\n	                    <a href=\"#\" onclick=\"showShopInfo( "
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.biz)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + " )\">\n	                        \n	                        <div class=\"ui-corner-all ui-icon-arrow-r ui-btn-icon-right\">\n	                            <span id=\"biz-id\" style=\"display:none;\">"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.biz)),stack1 == null || stack1 === false ? stack1 : stack1.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</span>\n	                            <span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp; "
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.biz)),stack1 == null || stack1 === false ? stack1 : stack1.title)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\n	                        </div>\n	                    </a>\n	                </li>\n	            ";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  
+  return "\n	                </ul>\n	                <p>초대매장이 존재하지 않습니다.</p>\n	                <ul>\n	            ";
+  }
+
+  buffer += "<div id=\"contents_center\" class=\"wrapped-content\">       \n	<div class=\"panel\">\n	    <div class=\"panel-heading\">\n	        <h4 class=\"panel-title\">\n	            <bold>나의 단골 매장</bold>\n	        </h4>\n	    </div>\n	    <div class=\"panel-body\">\n	        <ul class=\"list-group\">\n	            <li class=\"list-group-item\">후룩텔레콤<span class=\"badge\">VIP</span></li>\n	        </ul>\n	    </div>\n	    <div class=\"panel-footer\">\n	        <div class=\"input-group\">\n	            <span class=\"input-group-btn\">\n	                <button class=\"btn blue\" id=\"btnQRCode\" type=\"button\" onclick=\"scan($('#shopCode'))\"><i class=\"glyphicon glyphicon-qrcode\"></i> </button>\n	            </span><input type=\"text\" class=\"form-control\" id=\"shopCode\" placeholder=\"매장 코드 입력\" >\n	            <span class=\"input-group-btn\">\n	                <button class=\"btn blue\" id=\"btnSelectShop\" type=\"button\" onclick=\"showShopInfo($('#shopCode').text())\"> <b>매장선택</b>&nbsp;  <i class=\"fa icon-right-bar\"></i></button>\n	            </span>\n	       </div> \n	    </div>\n	</div>\n	\n	<div class=\"panel\">\n	    <div class=\"panel-heading\">	                                 \n	        <div class=\"row\">\n	            <h4 class=\"panel-title\">\n	                <div class=\"col-xs-12\">\n	                    초대매장\n	                </div>\n	            </h4>\n	        </div>\n	    </div><!-- 제목-->\n	    <div class=\"panel-body\">\n	        <ul class=\"list-group\">\n	            ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n	            \n	        </ul>	\n	    </div>\n	</div><!-- 하나의 글 -->	\n</div>";
+  return buffer;
+  });
+})();

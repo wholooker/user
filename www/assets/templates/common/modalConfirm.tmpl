@@ -1,0 +1,20 @@
+(function() {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['modalConfirm'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
+
+
+  buffer += "<div id=\"contents_center\" class=\"wrapped-content modal-confirm\">\n    <div class=\"txt-center\">\n        <h4 class=\"title txt-center\">";
+  if (helper = helpers.title) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.title); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</h4>\n    </div>\n    <hr>\n    <div class=\"txt-center\">\n        <h6 class=\"title txt-center\">";
+  if (helper = helpers.text) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.text); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</h6>\n    </div>\n    <div class=\"txt-center\">\n        <a id=\"btnModalConfirm\" href=\"#\" class=\"button round tiny hover\">확인</a>\n    </div>\n</div>";
+  return buffer;
+  });
+})();
