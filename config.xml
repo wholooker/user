@@ -11,16 +11,5 @@
     <access origin="http://dev.wholook.net" subdomains="true" />
     <access origin="*" />
     <preference name="Orientation" value="portrait" />
-    <preference name="DisallowOverscroll" value="true"/>
     
-    <feature name="debug-server" required="true">
-    	<param name="domain" value="http://localhost:8080"/>
-    	<param name="key" value="net.wholook.app.user"/>
-  	</feature>
-  
-<!--
-	<gap:plugin name="com.phonegap.plugins.barcodescanner" />
-    <preference name="SplashScreen" value="splash" />
-	<preference name="SplashScreenDelay" value="10000" />
--->
 </widget>

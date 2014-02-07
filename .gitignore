@@ -25,3 +25,7 @@ proguard/
 .metadata
 .DS_Store
 .metadata/
+.classpath
+.project
+.prefs
+test.html

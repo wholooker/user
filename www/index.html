@@ -43,7 +43,7 @@
         <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
         
        
-        <script type="text/javascript" charset="utf-8" src="barcodescanner.js"></script>
+        <!--<script type="text/javascript" charset="utf-8" src="barcodescanner.js"></script>-->
         
 		<!--[if lt IE 9]>
 		<script src='assets/js/vendor/html5shiv.js'></script>
@@ -56,7 +56,7 @@
 				
 			function onLoad(){
 	        	
-	        	document.addEventListener("deviceready", onDeviceReady, true);
+	        	document.addEventListener("deviceready", onDeviceReady, false);
 	        	
 	        }
 			
@@ -71,7 +71,7 @@
 				document.addEventListener("resume", onResume, false);
 				document.addEventListener("menubutton", onMenuKeyDown, false);
 				
-				//navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
+				navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
 				checkConnection();
 				
 	        	
@@ -104,12 +104,14 @@
 	    			click_back_btn();	
 	    		}else
 	    		{
+	    			/*
 	    			navigator.notification.confirm(
 			            '앱을 종료 하시겠습니까?', // message
 			             onBackEnd,            // callback to invoke with index of button pressed
 			            'Game Over',           // title
 			            ['예','아니오']         // buttonLabels
 			        );	
+			        */
 	    		}
     			
 	    	}
@@ -123,7 +125,7 @@
 	    	}
 	    	
 	    	function onMenuKeyDown() {
-	    		//alert("onMenuKeyDown");	
+	    		alert("onMenuKeyDown");	
 	    	}
     		
     		function getLocationSuccess( position ){
@@ -136,13 +138,12 @@
                             'Speed: '              + position.coords.speed                 + '\n' +
                             'Timestamp: '          + position.timestamp                    + '\n';	
                             
-                alert( message );
-                
-               
+                console.log( message );
+
     		}
     		
     		function getLocationonError( err ){
-    			alert(' getLocationonError code: '    + err.code    + '\n' +
+    			console.log(' getLocationonError code: '    + err.code    + '\n' +
               'message: ' + err.message + '\n');
     		}
     		
@@ -163,10 +164,25 @@
 	            states[navigator.connection.CELL]     = 'Cell generic connection';
 	            states[navigator.connection.NONE]     = 'No network connection';
 				
-				
+
 				console.log( "Network State=======" + states[networkState] );
 	            if( states[networkState] != 'No network connection' )
 	            	Network_State = true;
+	            
+	            //devicePlatform = cordova.device.model;
+			
+		        console.log( "devicePlatform====" + cordova.device );
+		       	/*
+		       	var deviceInfo = 'Device Name: '     + device.name     + '/n' +
+	                            'Device Model: '    + device.model    + '/n' +
+	                            'Device Cordova: '  + device.cordova  + '/n' +
+	                            'Device Platform: ' + device.platform + '/n' +
+	                            'Device UUID: '     + device.uuid     + '/n' +
+	                            'Device Version: '  + device.version  + '/n';
+		       	
+		       	
+		       	console.log( "deviceInfo====" + deviceInfo );
+		       	*/
 	        }
         
     	//////////////////// event add end ///////////////////////
@@ -390,21 +406,8 @@
 		
 		function startGUI() {           
 			
-			/*
-			devicePlatform = device.platform;
 			
-	        console.log( "devicePlatform====" + devicePlatform );
-	       	
-	       	var deviceInfo = 'Device Name: '     + device.name     + '/n' +
-                            'Device Model: '    + device.model    + '/n' +
-                            'Device Cordova: '  + device.cordova  + '/n' +
-                            'Device Platform: ' + device.platform + '/n' +
-                            'Device UUID: '     + device.uuid     + '/n' +
-                            'Device Version: '  + device.version  + '/n';
-	       	
-	       	
-	       	console.log( "deviceInfo====" + deviceInfo );
-	       	*/
+			
 			setUpdateTimer(3000);
 			
 			set_back_btn(false,'');
@@ -418,7 +421,7 @@
     		
     		//test user sample data 생성
     		removeGuestID();
-    		//setLocalGuestID( 2335 );
+    		setLocalGuestID( 2335 );
     		
     		if( getLocalGuestID() == null || getLocalGuestID() == '' )
     		{//최초 사용자
