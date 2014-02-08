@@ -235,7 +235,7 @@ function getLocationonError( err ){
 function checkConnection() {
 	
 	// 테스트시 제대로 동작하지 않음 Unknown connection 으로 읽어 오는 경우가 허다함
-	/*
+	
 	var networkState = navigator.connection.type;		
 	// cordova 2.3 before Connetion after navigator.connection
 	
@@ -257,7 +257,7 @@ function checkConnection() {
     //devicePlatform = cordova.device.model;
 
     console.log( "devicePlatform====" + cordova.device );
-   	
+   	/*
    	var deviceInfo = 'Device Name: '     + device.name     + '/n' +
                     'Device Model: '    + device.model    + '/n' +
                     'Device Cordova: '  + device.cordova  + '/n' +
@@ -268,7 +268,6 @@ function checkConnection() {
    	
    	console.log( "deviceInfo====" + deviceInfo );
    	*/
-   	Network_State = true;
 }
 	          	
 //el = 결과값 보여줄 element		

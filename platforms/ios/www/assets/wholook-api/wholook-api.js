@@ -1,5 +1,8 @@
 
-var _WHOLOOK_STORAGE_PREFIX_ = 'wholook_storage_';
+
+////////////////////////////////////////////////////////
+/////////////// prototype extention ////////////////////
+////////////////////////////////////////////////////////
 
 Array.prototype.remove = function(x) {
 	for (i in this) {
@@ -9,27 +12,109 @@ Array.prototype.remove = function(x) {
 	}
 };
 
-Array.prototype.findByField = function(field,key) {
+Array.prototype.removeByIdx = function(idx) {
+	this.splice(idx, 1);
+};
+
+Array.prototype.values = function(field) {
+	var values = [];
+	
 	for ( var i=0 ; i<this.length ; i++) {
-		if ( this[i][field] == key ) return this[i];
+		values.push(this[i][field]);
+	}
+	
+	return values;
+};
+
+Array.prototype.findByField = function(field,val) {
+	return this.getByField(field,val);
+};
+
+Array.prototype.getByField = function(field,val) {
+	for ( var i=0 ; i<this.length ; i++) {
+		if ( this[i][field] == val ) return this[i];
 	}
 	
 	return null;
 };
 
-Array.prototype.findByEvalField = function(field,key) {
+Array.prototype.getIndexByField = function(field,val) {
 	for ( var i=0 ; i<this.length ; i++) {
-		if ( eval('this[i].'+field) == key ) return this[i];
+		if ( this[i][field] == val ) return i;
+	}
+	
+	return -1;
+};
+
+Array.prototype.findByEvalField = function(field,val) {
+	for ( var i=0 ; i<this.length ; i++) {
+		if ( eval('this[i].'+field) == val ) return this[i];
 	}
 	
 	return null;
 };
 
+Array.prototype.filteredArray = function(filter) {
+	var result = this;
+	
+	
+	$.each(filter, function(field, val) {
+		var filtered = [];
+		
+		try {
+		
+		$.each(result, function(idx, obj) { 
+			if ( eval('obj.'+field) === val ) {
+				filtered.push(obj);
+			}
+		});
+		
+		} catch(e) {
+			return true;
+		}
+		
+		result = filtered;
+	});
+	
+	return result;
+};
+
+if ( !Array.prototype.forEach ) {
+  Array.prototype.forEach = function(fn, scope) {
+    for(var i = 0, len = this.length; i < len; ++i) {
+      fn.call(scope, this[i], i, this);
+    }
+  };
+}
+
+Date.prototype.addDays = function(days)
+{
+    var dat = new Date(this.valueOf());
+    dat.setDate(dat.getDate() + days);
+    return dat;
+};
+
+Date.prototype.format = function() {
+    var day = this.getDate();
+    var month = this.getMonth() + 1;
+    var year = this.getFullYear();
+    if (day < 10) {
+        day = "0" + day;
+    }
+    if (month < 10) {
+        month = "0" + month;
+    }
+    var date = year + "-" + month + "-" + day;
+
+    return date;
+};
+
+////////////////////////////////////////////////////////
 ////////////////////// ajax ////////////////////////////
+////////////////////////////////////////////////////////
 
 
 var keyURL = 'http://dev.wholook.net/api/handshake/';
-//var keyURL = 'localhost:8000/api/handshake/';
 var wtls_passphrase=null;
 
 function get_aes_key() {
@@ -45,7 +130,7 @@ function get_aes_key() {
 }
 
 
-function wholookTLSHandshake(done,error) {
+function wholookTLSHandshake(success,error) {
 	
 	$.ajaxSetup({
 	    beforeSend: function(xhr, settings) {
@@ -53,7 +138,7 @@ function wholookTLSHandshake(done,error) {
 	        xhr.setRequestHeader("X-CSRFToken", csrftoken);
 	    }
 	});
-	//*/
+	
 	$.getJSON(keyURL+"1/", function(json) {
 		
 		var rsa = new RSAKey();
@@ -67,7 +152,7 @@ function wholookTLSHandshake(done,error) {
 			url: keyURL+'2/',
 			type: 'POST',
 			data: {'passphrase':sfdata },
-			success: done,
+			success: success,
 			error: error
 		});
 
@@ -85,13 +170,11 @@ function wholookSecuredPost(url, args) {
 	    beforeSend: function(xhr, settings) {
 	    	csrftoken = $.cookie('csrftoken');
 	        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-	        
 	    }
 	});
 	
 	if ( wtls_passphrase == null ) {
 		args['error']('not handshaked');
-		
 		return false;
 	}
 	
@@ -103,10 +186,10 @@ function wholookSecuredPost(url, args) {
 		type: 'POST',
 		dataType: "json",
 		data: {'__sfdata':sfdata },
-		success: args['done'],
+		success: args['success'],
 		error: args['error']
 	});
-	
+
 	return true;
 }
 
@@ -125,133 +208,156 @@ function wholookPost(url, args) {
 		type: 'POST',
 		dataType: "json",
 		data: args['data'],
-		success: args['done'],
+		success: args['success'],
 		error: args['error']
 	});
 	
 }
 
 
-function wholookUpdateData(url,  data, args) {
-	
-}
+////////////////////////////////////////////////////////////
+////////////////////// data models /////////////////////////
+////////////////////////////////////////////////////////////
 
-
-/////////////// data models /////////////////////////
-
-var __wholook_model_default_options = {
+var __WHOLOOK_STORAGE_PREFIX_ = 'wholook_storage_';
+var __WHOLOOK_MODEL_DEFAULT_OPTIONS = {
 	url:null,
-	data:[],
+	save_url:null,
+	delete_url:null,
+	
+	data:{},
 	name: null,
 	model:null,
 	key:'id',	
+	name_key:'name',
 	
 	storage: {
 		model: null,
-		timestamp_url: null,
-		force_update: false,
+		id: null,
+		timestamp_url: '/api/timestamp/',
 	},
 	
-	onLoading:null,
-	onLoaded:null,
 };
 
-function WholookModel(options) {
-	this.options = $.extend({},__wholook_model_default_options, options);
-	this.data = [];
-	
-	this.loadingStatus = false;
+function WholookModel(options,data) {
+	if ( typeof options === "object")
+ 		this.options = $.extend(true,{},__WHOLOOK_MODEL_DEFAULT_OPTIONS, options);
+ 	else 
+ 		this.options = $.extend(true,{},__WHOLOOK_MODEL_DEFAULT_OPTIONS,__WHOLOOK_BUILTIN_MODEL[options]);
+
+	this.data = data || [];
+	this.loadingStatus = ( typeof data !== 'undefined' );
 }
 
-WholookModel.prototype.changeLoadingStatus = function(status, callback) {
+// internal
+WholookModel.prototype._changeLoadingStatus = function(status) {
 	var model = this;
 	
 	if ( status == model.loadingStatus ) return;
 	model.loadingStatus = status;
-	
-	if ( status ) {
-		// loading start
-		if ( model.options.onLoading != null ) 
-			model.options.onLoading();
-	} else {
-		// loading complete
-		if ( model.options.onLoaded != null ) 
-			model.options.onLoaded(model.data);
-			
-		if ( typeof callback !== "undefined" ) 
-			callback(model.data);	
-	}
+
 };
 
-WholookModel.prototype.load = function(done,error) {
-	
-	this.changeLoadingStatus(true);
+WholookModel.prototype._getStorageKey = function() {
+	return __WHOLOOK_STORAGE_PREFIX_+ this.options.storage.model + ':' + (this.options.storage.id || '');
+}
+
+
+WholookModel.prototype.load = function(from, success, error) {
+
+	if ( typeof from === 'function' ) {
+		error = success;
+		success = from;
+		from = 'auto';
+	}
+
+	var from = from || "auto";
+
+	this._changeLoadingStatus(true);
 	
 	var model = this;
-	
-	// check local data availability
-	if ( model.options.storage.model != null &&
-		localStorage[_WHOLOOK_STORAGE_PREFIX_+model.options.storage.model] != undefined &&
-		!model.options.storage.force_update ) {
+	var storage_model = model.options.storage.model;
+	var storage_key = this._getStorageKey();
 		
-		var local = localStorage[_WHOLOOK_STORAGE_PREFIX_+model.options.storage.model];
+	// check local data availability
+	if ( from === "auto" && 
+		storage_model &&
+		localStorage[storage_key] ) {
+		
+		var local = localStorage[storage_key];
 		local = JSON.parse(local);
 	 	
 	 	if ( model.options.storage.timestamp_url == null ) {
-			model.loadFromServer(done, error);
+			model.loadFromServer(success, error);
 			return;
 		}
 		 		
 		wholookPost(model.options.storage.timestamp_url,{
-				data:model.options.data,
-				done:function(json) {
+				data:$.extend({},model.options.data,{model:storage_model}),
+				success:function(json) {
 					var timestamp = json.timestamp;
-					console.log(json);
-					console.log('timestamp is '+timestamp);
+					console.log('timestamp for '+ storage_key +' is '+timestamp+' local:'+local.timestamp);
 					
 					if ( local.timestamp >= timestamp ) {
-						model.loadFromStorage(done, error);
-					} else {
-						model.loadFromServer(done, error);
+						console.log("Load model "+storage_model+" from Local Storage");	
+
+						model.loadFromStorage(success, error);
+					} else {	
+						console.log("Load model "+storage_model+" from Server");	
+
+						model.loadFromServer(success, error);
 					}
 				},
 				error:function(error) {
 					console.log('에러!');
-					model.loadFromServer(done, error);
+					model.loadFromServer(success, error);
 				}
 			});
 			
 	} else {
-	
-		model.loadFromServer(done, error);
+		if ( from === "server" )	
+			model.loadFromServer(success, error);
+		else if ( from === "storage") 
+			model.loadFromStorage(success, error);
+		else 
+			model.loadFromServer(success, error);
 	}
 };
  
-WholookModel.prototype.loadFromStorage = function(done, error) {
+WholookModel.prototype.loadFromStorage = function(success, error) {
 	var model = this;
+	var storage_key = model._getStorageKey();
 
-	console.log("Load model "+this.options.model+" from Local Storage");	
-	this.changeLoadingStatus(true);
+	model._changeLoadingStatus(true);
 	
-	var local = localStorage[_WHOLOOK_STORAGE_PREFIX_+model.options.storage.model];
-	local = JSON.parse(local);
-	model.data = local.data;
-	
-	if ( done != undefined )
-		model.changeLoadingStatus(false, done);
+	if ( localStorage[storage_key] ) {
+		var local = localStorage[storage_key];
+		local = JSON.parse(local);
+		model.data = local.data;
+		model._changeLoadingStatus(false);
+
+		if ( success ) 
+			success(local.data);
 		
-	return;
+	} else {
+		model._changeLoadingStatus(false);
+
+		if ( error ) 
+			error('local data empty');	
+
+		return false;
+	}
+
+	return true;
 };
 
-WholookModel.prototype.loadFromServer = function(done, error) {
+WholookModel.prototype.loadFromServer = function(success, error) {
 	var model = this;
-
-	console.log("Load model "+this.options.model+" from Server");	
-	this.changeLoadingStatus(true);
+	model._changeLoadingStatus(true);
 		
 	wholookPost(model.options.url,{
 			data:model.options.data,
-			done:function(json) {	
+			success:function(json) {	
 				var timestamp = parseInt(new Date().getTime() / 1000);
 				
 				if ( json instanceof Array )
@@ -259,53 +365,71 @@ WholookModel.prototype.loadFromServer = function(done, error) {
 					model.data = json;	
 				}
 				else {
-					model.data = json.data;
+					model.data = json.data || [];
 					timestamp = json.timestamp;
+					console.log('update '+model.options.storage.model+' timestamp : '+timestamp);
 				}
 				
 				// save to local
-				if ( model.options.storage.model != null ) {
-					localStorage[_WHOLOOK_STORAGE_PREFIX_+model.options.storage.model] = JSON.stringify({
+				if ( model.options.storage.model ) {
+					localStorage[model._getStorageKey()] = JSON.stringify({
 						timestamp: timestamp,
 						data: model.data,
 					});
 				}
 				
-				if ( done != undefined )
-					model.changeLoadingStatus(false, done);
+				model._changeLoadingStatus(false);
+				if ( success ) 
+					success(json.data);
+			},
+			error:function(err) {
+				model._changeLoadingStatus(false);
+				if ( error ) 
+					error(err);
 			}
 	});
 };
 
 
-WholookModel.prototype.save = function(data, done, error) {
+WholookModel.prototype.save = function(data, success, error) {
 	
 	var model = this;
 	var url = model.options.save_url;
 	
-	if ( typeof url === 'undefined' || url == null ) {
+	if ( url == null ) {
 		console.error("save url is not set");
-		return;
+		return -1;
 	}
 	
+	var save_data = {};
+	$.each(data, function(key,val) {
+		
+		if ( typeof val === 'object')
+			save_data[key] = JSON.stringify(val);
+		else
+			save_data[key] = val;
+		
+	});
+	
 	wholookPost(url,{
-		data: data,
-		done: function(result) {
-			console.log(result);
+		data: save_data,
+		success: function(result) {
 			if ( result.result == 0 ) {
 				data.id = result.id;
 			}
 			
 			model.set(data);
 			
-			if ( typeof done !== 'undefined' )
-				done(data);
+			if ( success )
+				success(data);
 		},
 		error: function() {
-			if ( typeof error !== 'undefined' )
+			if ( error )
 				error();
 		}
 	});
+
+	return 0;
 };
 
 WholookModel.prototype.set = function(object) {
@@ -316,8 +440,9 @@ WholookModel.prototype.set = function(object) {
 };
 
 WholookModel.prototype.remove = function(id, from_server) {
-	
-	if ( typeof from_server !== 'undefined' && from_server ) {
+	var from_server = from_server || false;
+
+	if ( from_server && this.options.delete_url ) {
 		wholookPost(this.options.delete_url,{
 			data: {
 				id:id,
@@ -336,15 +461,30 @@ WholookModel.prototype.remove = function(id, from_server) {
 };
 
 WholookModel.prototype.get = function(id) {
-	return this.getByField(this.options.key, id);
+	return this.toWholookObject(this.getByField(this.options.key, id));
+};
+
+WholookModel.prototype.filteredObjects = function(filter) {
+	var data = this.data.filteredArray(filter);
+	return this.toWholookObject(data);
+};
+
+WholookModel.prototype.filteredModel = function(filter) {
+	var data = this.data.filteredArray(filter);
+	return new WholookModel(this.options, data);
 };
 
 WholookModel.prototype.getByField = function(field, id) {
-	return this.data.findByField(field, id);
+	return this.toWholookObject(this.data.findByField(field, id));
+};
+
+WholookModel.prototype.getByName = function(name) {
+	var key = this.options.name_key;
+	return this.toWholookObject(this.data.findByField(key, name));
 };
 
 WholookModel.prototype.all = function() {
-	return this.data;
+	return this.toWholookObject(this.data);
 };
 
 WholookModel.prototype.count = function() {
@@ -353,183 +493,233 @@ WholookModel.prototype.count = function() {
 };
 
 WholookModel.prototype.values = function(field) {
-	var result = [];
-	
-	$.each(this.data, function(idx, obj) {
-		result.push(obj[field]);
-	});
-	
-	return result;
+	var field = field || this.options.key;
+	return this.data.values(field);
 };
 
+WholookModel.prototype.names = function(field) {
+	var field = field || this.options.name_key;
+	return this.data.values(field);
+};
+
+WholookModel.prototype.toWholookObject = function(data) {
+	if ( data == null ) return null;
+	
+	if ( data instanceof Array ) {
+		var objs = [];
+		var model = this;
+		
+		$.each(data, function(idx,obj) {
+			objs.push(new WholookObject(model, obj));
+		});
+		
+		return objs;
+	} else {
+		return new WholookObject(this, data);
+	}
+};
 
 //////////////////////////////////////////
 
+function WholookObject(model,data) {
+	$.extend(this,data);
+	this._model = model;	
+}
+
+WholookObject.prototype.getKey = function(obj) {
+	var key = this._model.options.key;
+	return this[key];
+};
+WholookObject.prototype.getName = function(obj) {
+	var key = this._model.options.name_key;
+	return this[key];
+};
+
+WholookObject.prototype.save = function(success, error) {
+	return this._model.save(this,success,error);
+};
+
+WholookObject.prototype.delete = function(from_server) {
+	return this._model.remove(this.getKey(), from_server);
+};
+
+//////////////////////////////////////////
 
 var __wholook_loader_default_options = {
 	models:[],
 	onProgress:null,
-	onComplete:null
+	onComplete:null,
+	onError:null,
 };
 
-function WholookLoader(options) {	
-	if ( options instanceof WholookModel ) {
-		this.options = $.extend({},__wholook_loader_default_options,{models:[options,]});
-	} else if ( options instanceof Array ) {
-		this.options = $.extend({},__wholook_loader_default_options,{models:options});
+function WholookLoader(args) {
+	
+	this.loaded = false;
+	
+	if ( args instanceof WholookModel ) {
+		this.options = $.extend({},__wholook_loader_default_options,{models:[args,]});
+	} else if ( args instanceof Array ) {
+		this.options = $.extend({},__wholook_loader_default_options,{models:args});
 	} else {
-		this.options = $.extend({},__wholook_loader_default_options, options);
+		this.options = $.extend({},__wholook_loader_default_options, args);
 	}
+	
+	var self = this;
+	// string to model instance
+	$.each(self.options.models, function(idx,model) {
+		if ( model instanceof WholookModel ) {
+
+		} else if ( typeof model === 'string' ) {
+			self.options.models[idx] = new WholookModel(__WHOLOOK_BUILTIN_MODEL[model]);
+		} else {
+			console.error('ignore: '+model);
+		}
+	});
 }
 
 WholookLoader.prototype.model = function(model) {
 	return this.options.models.findByEvalField('options.model',model);
 };
 
-WholookLoader.prototype.load = function(index) {
-	this._loadLoop(0);
+WholookLoader.prototype.load = function(from) {
+	this._loadLoop(0,from||"auto");
 };
 
-WholookLoader.prototype._loadLoop = function(index) {
 
+WholookLoader.prototype.isLoaded = function() {
+	return this.loaded;
+};
+
+WholookLoader.prototype.filter = function(filter) {
+	$.each(this.options.models,function(idx,model) {
+		 model.data =  model.data.filteredArray(filter);
+	});
+};
+
+// internal only
+WholookLoader.prototype._loadLoop = function(index, from) {
+	var self = this;
 	// progress
-	if (index >= this.options.models.length) {
-
-		if ( this.options.onComplete != null )
-			this.options.onComplete();
+	if (index >= self.options.models.length) {
+		
+		self.loaded=true;
+		
+		if ( self.options.onComplete ) 
+			self.options.onComplete();
 	} else {
-		var target = this.options.models[index];
-		if ( this.options.onProgress != null )
-			this.options.onProgress((100 / this.options.models.length * index), target);
+		var target = self.options.models[index];
+		if ( self.options.onProgress )
+			self.options.onProgress((100 / self.options.models.length * index), target);
 
-		var loop = this;
 		var next_index = index + 1;
-		target.load(function(data) {
-			console.log('index '+index+' in '+loop.options.models.length+' is loaded');
-			loop._loadLoop(next_index);
-		});
+
+		target.load(from, function(data) {
+				self._loadLoop(next_index, from);
+			},function(error) {
+				if ( self.options.onError )
+					self.options.onError(error);
+				console.error('[WholookLoader] Loading error : '+error.status);
+			});
 	}
 	
 };
 
-///////////////// Predefined Models ///////////////////////////////
+////////////////////////////////////////////////////////////
+///////////////// Predefined Models ////////////////////////
+////////////////////////////////////////////////////////////
 
-var carrier = new WholookModel({
-	url: '/biz_phone/api2/data/carrier/',
-	model: 'carrier',	
-	name: '통신사',
-	key: 'code',
-	
-	storage: {
-		model: 'carrier',
-		timestamp_url : '/biz_phone/api2/data/carrier/timestamp/',
-	}
-	
-});
-
-var model = new WholookModel({
-	url: '/biz_phone/api2/data/model/',
-	model: 'model',
-	name: '폰모델',
-	key: 'id',
-	
-	storage: {
+var __WHOLOOK_BUILTIN_MODEL = {
+	carrier: {
+		url: '/biz_phone/api/data/carrier/',
+		model: 'carrier',	
+		name: '통신사',
+		key: 'code',
+		
+		storage: {
+			model: 'biz_phone.carrier',
+		}
+	},
+	model: {
+		url: '/biz_phone/api/data/model/',
 		model: 'model',
-		timestamp_url : '/biz_phone/api2/data/model/timestamp/',
-	}
-	
-});
-
-
-var plan = new WholookModel({
-	url: '/biz_phone/api2/data/plan/',
-	model: 'plan',
-	name: '요금제',
-	key: 'id',
-	
-	
-	storage: {
+		name: '폰모델',
+		key: 'id',
+		name_key: 'code',
+		
+		storage: {
+			model: 'biz_phone.model',
+		}
+	},
+	plan: {
+		url: '/biz_phone/api/data/plan/',
 		model: 'plan',
-		timestamp_url : '/biz_phone/api2/data/plan/timestamp/',
-	}
-	
-});
-
-var regtype = new WholookModel({
-	url: '/biz_phone/api2/data/regtype/',
-	model: 'regtype',
-	name: '가입방법',
-	key: 'id',
-	
-	storage: {
+		name: '요금제',
+		key: 'id',
+		
+		storage: {
+			model: 'biz_phone.plan',
+		}
+	},
+	regtype: {
+		url: '/biz_phone/api/data/regtype/',
 		model: 'regtype',
-		timestamp_url : '/biz_phone/api2/data/regtype/timestamp/',
-	}
-	
-});
-
-//tag, installment, contract,module,para
-
-var tag = new WholookModel({
-	url: '/biz_phone/api2/data/tag/',
-	model: 'tag',
-	name: '테그',
-	key: 'code',
-	
-	storage: {
+		name: '가입방법',
+		key: 'id',
+		
+		storage: {
+			model: 'biz_phone.regtype',
+		}
+	},
+	tag: {
+		url: '/biz_phone/api/data/tag/',
 		model: 'tag',
-		timestamp_url : '/biz_phone/api2/data/tag/timestamp/',
-	}
-	
-});
-
-var installment = new WholookModel({
-	url: '/biz_phone/api2/data/installment/',
-	model: 'installment',
-	name: '할부개월',
-	key: 'code',
-	
-	storage: {
+		name: '테그',
+		key: 'code',
+		
+		storage: {
+			model: 'biz_phone.tag',
+		}
+	},
+	installment:{
+		url: '/biz_phone/api/data/installment/',
 		model: 'installment',
-		timestamp_url : '/biz_phone/api2/data/installment/timestamp/',
-	}
-	
-});
-var contract = new WholookModel({
-	url: '/biz_phone/api2/data/contract/',
-	model: 'contract',
-	name: '약정개월',
-	key: 'code',
-	
-	storage: {
+		name: '할부개월',
+		key: 'code',
+		
+		storage: {
+			model: 'biz_phone.installment',
+		}
+	},
+	contract: {
+		url: '/biz_phone/api/data/contract/',
 		model: 'contract',
-		timestamp_url : '/biz_phone/api2/data/contract/timestamp/',
-	}
-	
-});
-var module = new WholookModel({
-	url: '/biz_phone/api2/data/module/',
-	model: 'module',
-	name: '계산모듈',
-	key: 'id',
-	
-	storage: {
+		name: '약정개월',
+		key: 'code',
+		
+		storage: {
+			model: 'biz_phone.contract',
+		}
+	},
+	module: {
+		url: '/biz_phone/api/data/module/',
 		model: 'module',
-		timestamp_url : '/biz_phone/api2/data/module/timestamp/',
-	}
-	
-});
-var param = new WholookModel({
-	url: '/biz_phone/api2/data/param/',
-	model: 'param',
-	name: '계산 파라메터',
-	key: 'id',
-	
-	storage: {
+		name: '계산모듈',
+		key: 'id',
+		
+		storage: {
+			model: 'biz_phone.module',
+		}
+	},
+	param: {
+		url: '/biz_phone/api/data/param/',
 		model: 'param',
-		timestamp_url : '/biz_phone/api2/data/param/timestamp/',
-	}
-	
-});
+		name: '계산 파라메터',
+		key: 'id',
+		
+		storage: {
+			model: 'biz_phone.param',
+		}
+	},
+};
 
 

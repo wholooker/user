@@ -22,10 +22,8 @@
 	    <link rel='stylesheet' href='assets/css/vendor/fontello.css'>
 	    <link rel='stylesheet' href='assets/css/style.css'>
 	    <link rel='stylesheet' href='assets/css/custom.css'>
+		<link rel="stylesheet" href="assets/css//wholook-ui.css">
 		
-		<!-- wholook ui css -->
-		
-		<link rel="stylesheet" href="assets/plugins/wholook/css/wholook-ui.css">
 	  
         <!-- Import GoogleWebFonts -->
         <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,100,200,700,500' rel='stylesheet' type='text/css'>
@@ -34,16 +32,8 @@
         <!-- Modernizr & HTML5 Shiv -->
         
         <script type="text/javascript" src='assets/js/vendor/modernizr.js'></script>
-        
-        
         <script type="text/javascript" src="assets/js/jquery.min.js"></script>
-        
-        <!-- Phonegap js import-->
-        
         <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
-        
-       
-        <!--<script type="text/javascript" charset="utf-8" src="barcodescanner.js"></script>-->
         
 		<!--[if lt IE 9]>
 		<script src='assets/js/vendor/html5shiv.js'></script>
@@ -71,7 +61,7 @@
 				document.addEventListener("resume", onResume, false);
 				document.addEventListener("menubutton", onMenuKeyDown, false);
 				
-				navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
+				//navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
 				checkConnection();
 				
 	        	
@@ -79,112 +69,6 @@
 				
 				startGUI();
 			}
-			
-			// 오프라인시 셋팅
-			function onOffline() {
-				console.log( "==onOffline");
-				Network_State = false;
-	    	}
-	    	
-	    	function onOnline() {
-	    		console.log( "==onOnline");
-	    		Network_State = true;
-	    	}
-	    	
-	    	function onBackEnd( buttonIndex )
-	    	{
-	    		if( buttonIndex == 1 ) appClose();	
-	    	}
-	    	// 기기상 백버튼 클릭시
-	    	function onBackKeyDown() {
-	    		
-	    		
-	    		if( $("#back_url").attr( "visibility") == "visible" )
-	    		{
-	    			click_back_btn();	
-	    		}else
-	    		{
-	    			/*
-	    			navigator.notification.confirm(
-			            '앱을 종료 하시겠습니까?', // message
-			             onBackEnd,            // callback to invoke with index of button pressed
-			            'Game Over',           // title
-			            ['예','아니오']         // buttonLabels
-			        );	
-			        */
-	    		}
-    			
-	    	}
-	
-	    	function onPause() {
-	    		alert("onPause");
-	    	}
-	    	
-	    	function onResume() {
-	    		alert("onResume");
-	    	}
-	    	
-	    	function onMenuKeyDown() {
-	    		alert("onMenuKeyDown");	
-	    	}
-    		
-    		function getLocationSuccess( position ){
-    			var message = 'Latitude: '           + position.coords.latitude              + '\n' +
-                            'Longitude: '          + position.coords.longitude             + '\n' +
-                            'Altitude: '           + position.coords.altitude              + '\n' +
-                            'Accuracy: '           + position.coords.accuracy              + '\n' +
-                            'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '\n' +
-                            'Heading: '            + position.coords.heading               + '\n' +
-                            'Speed: '              + position.coords.speed                 + '\n' +
-                            'Timestamp: '          + position.timestamp                    + '\n';	
-                            
-                console.log( message );
-
-    		}
-    		
-    		function getLocationonError( err ){
-    			console.log(' getLocationonError code: '    + err.code    + '\n' +
-              'message: ' + err.message + '\n');
-    		}
-    		
-    		function checkConnection() {
-    			
-    			// 테스트시 제대로 동작하지 않음 Unknown connection 으로 읽어 오는 경우가 허다함
-    			
-    			var networkState = navigator.connection.type;		
-    			// cordova 2.3 before Connetion after navigator.connection
-    			
-	            var states = {};
-	            states[navigator.connection.UNKNOWN]  = 'Unknown connection';
-	            states[navigator.connection.ETHERNET] = 'Ethernet connection';
-	            states[navigator.connection.WIFI]     = 'WiFi connection';
-	            states[navigator.connection.CELL_2G]  = 'Cell 2G connection';
-	            states[navigator.connection.CELL_3G]  = 'Cell 3G connection';
-	            states[navigator.connection.CELL_4G]  = 'Cell 4G connection';
-	            states[navigator.connection.CELL]     = 'Cell generic connection';
-	            states[navigator.connection.NONE]     = 'No network connection';
-				
-
-				console.log( "Network State=======" + states[networkState] );
-	            if( states[networkState] != 'No network connection' )
-	            	Network_State = true;
-	            
-	            devicePlatform = cordova.device.model;
-			
-		        console.log( "devicePlatform====" + devicePlatform );
-		       	/*
-		       	var deviceInfo = 'Device Name: '     + device.name     + '/n' +
-	                            'Device Model: '    + device.model    + '/n' +
-	                            'Device Cordova: '  + device.cordova  + '/n' +
-	                            'Device Platform: ' + device.platform + '/n' +
-	                            'Device UUID: '     + device.uuid     + '/n' +
-	                            'Device Version: '  + device.version  + '/n';
-		       	
-		       	
-		       	console.log( "deviceInfo====" + deviceInfo );
-		       	*/
-	        }
-        
     	//////////////////// event add end ///////////////////////
 			
 		</script>
@@ -202,7 +86,7 @@
    -->
      
     <!-- loader --> 
-    <div id="loading" class="loader" style="display:none;">
+    <div id="loading" class="loader" style="display:hidden;">
         <div class="status_custom">
         </div>
     </div>
@@ -267,13 +151,7 @@
     </div>
       
     <!-- =Container -->
-	
-
-
-   
     <script>!window.jQuery && document.write('<script src="assets/js/vendor/jquery.js"><\/script>')</script>
-    
-	
 	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 	<script src="assets/plugins/jqm/jquery.mobile-1.4.0.min.js"></script>
 	
@@ -311,32 +189,17 @@
 	<script type="text/javascript" src="assets/plugins/wholook/js/cert/prng4.js"></script>
 	<script type="text/javascript" src="assets/plugins/wholook/js/cert/rng.js"></script>
 	<script type="text/javascript" src="assets/plugins/wholook/js/cert/rsa.js"></script>
-	<script type="text/javascript" src="assets/plugins/wholook/js/crypto-js/aes.js"></script>
-	
-    
-    
+	<script type="text/javascript" src="assets/plugins/wholook/js/crypto-js/aes.js"></script>	
     <script type="text/javascript" src="assets/wholook-api/wholook-api.js"></script>
-    <script type="text/javascript" src="assets/wholook-api/wholook-mobile.js"></script>
+    
     
     <script type="text/javascript" src="assets/wholook-api/wholookUserVo.js"></script>
-    
-    <script type="text/javascript" src="assets/wholook-api/wholook.js"></script>
-    
-    <!-- wholook-ui js import-->
-  	
-    <script type="text/javascript" src="assets/plugins/wholook/js/wholook-ui.js"></script>
+    <script type="text/javascript" src="assets/wholook-api/wholook-user-interface.js"></script>
+    <script type="text/javascript" src="assets/wholook-api/wholook-common-ui.js"></script>
  	<script type="text/javascript" src="assets/wholook-api/wholook-mobileUI.js"></script>
- 	<!--<script type="text/javascript" src="assets/wholook-api/time_worker.js"></script>-->
- 	
- 	
-	
 	
     <script type="text/javascript">
              
-       	    
-        var back_action = '';
-        
-        
         var userVo = new UserVo(); 
 		var template = null; 
 		var temlpate_data = null;
@@ -351,78 +214,20 @@
     		alert("업데이트중...");
     	}
     	
-    	
-		//el = 결과값 보여줄 element		
-		function scan( el ) {
-			
-	        cordova.plugins.barcodeScanner.scan(function(result) {
-	        	
-	        	el.val( result.text);
-	        	
-            }, function(error) {
-                alert("Scanning failed: " + error);
-            });
-	    }
-	    
-	    function encode(type, data) {
-	        cordova.plugins.barcodeScanner.encode(type, data, function(result) {
-	        s
-                alert("encode success: " + result);
-            }, function(error) {
-                alert("encoding failed: " + error);
-            });
-	    }
-    	
-		// 메인 툴바 액션 정의
-		function set_back_btn( btnState, action){
-			if( btnState )
-			{
-				$("#back_url").css("visibility","visible");	
-			}else
-			{
-				$("#back_url").css("visibility","hidden");
-			}
-			back_action = action;
-		}
-		// 메인 툴바에 백버튼 클릭 이벤트	
-		function click_back_btn(){
-
-			if( back_action == null || back_action == '' )
-			{
-				set_back_btn( false,'');	
-			}else
-			{
-				
-				switch ( back_action )
-				{
-					case 'LOGIN_AFTER' :
-						
-						logIn_after(getLocalGuestID()); 
-						break;
-					//case 'SHOP_INFO' : logIn_after(getLocalGuestID()); break;
-				}
-			}
-		}
 		
 		function startGUI() {           
-			
-			
-			
+
 			setUpdateTimer(3000);
-			
 			set_back_btn(false,'');
 			
 			$("#back_url").bind( { click: function(){
 				click_back_btn();	
 			}});
-			
-
-    		setLoadingImgPath("../assets/images/spinner.gif"); 
+    		setLoadingImgPath("assets/images/spinner.gif"); 
     		
     		//test user sample data 생성
     		removeGuestID();
-    		setLocalGuestID( 2335 );
-    		
+    		//setLocalGuestID( 2335 );
     		if( getLocalGuestID() == null || getLocalGuestID() == '' )
     		{//최초 사용자
     			console.log( " 최초 사용자 ");
@@ -437,6 +242,7 @@
     					console.log( " 핸드쉐이크 -> user_register ");
     					user_register();		
     				},function( error){
+    					console.log( " shake error");
     					alert( "암호화 가정중 에러 발생");
     					appClose();	
     				});		
@@ -446,7 +252,7 @@
     			if( !getNetworkState() )
     			{
     				//네트웍 연결 안된 사용자
-    				logIn_after( getLocalGuestID() );
+    				logIn_success( getLocalGuestID() );
     			}else
     			{
     				//네트웍 연결 사용자

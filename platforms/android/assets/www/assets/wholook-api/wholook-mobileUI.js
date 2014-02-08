@@ -23,6 +23,15 @@ function buildShopImageFlip() {
         }
    });  
 }
+
+var userVo = new UserVo(); 
+var template = null; 
+var temlpate_data = null;
+
+var messageObj; 
+var smsCount = 0;
+var firstStepCount = 0;
+
 //가입 모듈
 function user_register(){
 	firstStepCount+=1;
@@ -33,10 +42,10 @@ function user_register(){
 		
 		appClose();
 	}
-	console.log( " user_register ");
+	console.log( " user_register start");
 	template = Handlebars.templates['identification']; //-- handlebar precompile 테스트 
     $("#content").html(template);
-    
+    console.log( " user_register load");
     // 인증번호 발송 
     $("#frmID > #btnSubmit").click(function(){ 
     	
@@ -78,16 +87,24 @@ function user_register(){
         	success: function( json ){
         		if (json.result == 0){
         			
-        			//$("#loading").hide();
+        			$("#loading").hide();
         			messageObj = {
         				title: "인증번호가 발송되었습니다.",
         				text: "SMS로 전달된 인증번호를 입력해 주십시요."
         			};
         			template = Handlebars.templates['modalConfirm'];
                     $(".status_custom").html(template(messageObj)); 
+                    $("#loading").show();
                     
         			$("#btnModalConfirm").click(function(){
                        $("#loading").hide();
+                       
+                        template = Handlebars.templates['modalLoading'];
+				        temlpate_data = {loading_text:'SMS 인증 중입니.'};
+				        
+				        $(".status_custom").html(template(temlpate_data));
+				        $("#loading").show();
+        
                       	var sendData =null;
 		
 						sendData = { 
@@ -184,6 +201,8 @@ function user_register(){
         });
        
     });
+    
+    //console.log( " user_register 나감");
 }
 
 // 로그인&업데이트 모듈
@@ -194,7 +213,35 @@ function user_UpdateLogIn(){
 
     $("#content").html(template);
     $("#certiNum").text('');
-   
+   	//sms_timer
+   	//* 테스트시만 20초 나중에 시간 정해서 바꿔야 됨
+   	var timeout = 20;
+		
+	var sms_timer = setInterval(function(){
+		$("#sms_timer").text( timeout + "초");
+		timeout = timeout - 1;
+		
+		
+	},1000);
+	
+	setTimeout(function(){
+		$("#sms_timer").text( "제한시간 - 종료");
+		messageObj = {
+                    title:'SMS인증 제한 시간 종료',
+                    text:'인증번호를 다시 받으십시요.'
+   	    };
+    	
+        template = Handlebars.templates['modalConfirm'];
+        $(".status_custom").html(template(messageObj)); 
+        $("#loading").show();    
+        $("#btnModalConfirm").click(function(){
+           	$("#loading").hide();
+          	clearInterval(sms_timer);
+			timeout = 20;
+			user_register();
+	        });
+	},20000);
+	//*/
     $("#frmFillCode #btnSubmit").click(function() {
         
         template = Handlebars.templates['modalLoading'];

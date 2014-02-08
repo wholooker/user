@@ -57,9 +57,9 @@
 				document.addEventListener("offline", onOffline, false);
 				document.addEventListener("online", onOnline, false);
 				document.addEventListener("backbutton", onBackKeyDown, false);
-				document.addEventListener("pause", onPause, false);
-				document.addEventListener("resume", onResume, false);
-				document.addEventListener("menubutton", onMenuKeyDown, false);
+				//document.addEventListener("pause", onPause, false);
+				//document.addEventListener("resume", onResume, false);
+				//document.addEventListener("menubutton", onMenuKeyDown, false);
 				
 				//navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
 				checkConnection();
@@ -86,7 +86,7 @@
    -->
      
     <!-- loader --> 
-    <div id="loading" class="loader" style="display:hidden;">
+    <div id="loading" class="loader" style="display:none;">
         <div class="status_custom">
         </div>
     </div>
@@ -200,20 +200,9 @@
 	
     <script type="text/javascript">
              
-        var userVo = new UserVo(); 
-		var template = null; 
-		var temlpate_data = null;
-		
-        var messageObj; 
-        var smsCount = 0;
-        var firstStepCount = 0;
-        
-        
-        
     	function refresh_ui_list(){
     		alert("업데이트중...");
     	}
-    	
 		
 		function startGUI() {           
 
@@ -227,7 +216,7 @@
     		
     		//test user sample data 생성
     		removeGuestID();
-    		setLocalGuestID( 2335 );
+    		//setLocalGuestID( 2335 );
     		if( getLocalGuestID() == null || getLocalGuestID() == '' )
     		{//최초 사용자
     			console.log( " 최초 사용자 ");
@@ -239,7 +228,7 @@
     			{
     				//네트웍 연결 사용자
     				wholookTLSHandshake(function() {
-    					console.log( " 핸드쉐이크 -> user_register ");
+    					console.log( " 핸드쉐이크 완료 -> user_register ");
     					user_register();		
     				},function( error){
     					console.log( " shake error");
@@ -257,6 +246,7 @@
     			{
     				//네트웍 연결 사용자
     				wholookTLSHandshake(function() {
+    					console.log( " 핸드쉐이크 완료 -> user_LogIn ");
     					user_LogIn( getLocalGuestID() );
     				},function( error){
     					alert( "암호화 가정중 에러 발생");

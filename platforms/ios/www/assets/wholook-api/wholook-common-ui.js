@@ -5,7 +5,38 @@
  *
  * 
  */
+	
+	var back_action = '';
+	// 메인 툴바 액션 정의
+	function set_back_btn( btnState, action){
+		if( btnState )
+		{
+			$("#back_url").css("visibility","visible");	
+		}else
+		{
+			$("#back_url").css("visibility","hidden");
+		}
+		back_action = action;
+	}
+	// 메인 툴바에 백버튼 클릭 이벤트	
+	function click_back_btn(){
 
+		if( back_action == null || back_action == '' )
+		{
+			set_back_btn( false,'');	
+		}else
+		{
+			
+			switch ( back_action )
+			{
+				case 'SHOP_LIST_REG' :
+					
+					showshoplist_reg(); 
+					break;
+				//case 'SHOP_INFO' : logIn_after(getLocalGuestID()); break;
+			}
+		}
+	}
 	/*  메인 메뉴 움직임    */
 	var isVisible = false;
 	
@@ -37,56 +68,7 @@
 		}
 	});
     	
-	/* 타이머 동작 */
 	
-	var Timer = (function( $ ){
- 
-		function timer( timeout ){
-		 
-			var deferred = $.Deferred();
-			var promise = deferred.promise();
-			var internalTimer = null;
-			var resolveContext = this;
-			var resolveArguments = Array.prototype.slice.call(
-				arguments,
-				1
-				);
-		 
-			promise.clear = 
-			function(){
-			 
-				clearTimeout( internalTimer );
-				 
-				deferred.rejectWith(
-				resolveContext,
-				resolveArguments
-				);
-			 
-			};
-		 
-			internalTimer = setTimeout(
-				function(){
-		 
-				deferred.resolveWith(
-					resolveContext,
-					resolveArguments
-				);
-		 
-				clearTimeout( internalTimer );
-				 
-				},
-				timeout
-			);
-
-			return( promise );
-			 
-			};
-		 
-		 
-		return( timer );
-		 
-		 
-	})( jQuery );
 	
 	/* 슬라이드 메뉴 컨트롤*/
 	$(function(){
