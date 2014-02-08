@@ -240,7 +240,7 @@ var __WHOLOOK_MODEL_DEFAULT_OPTIONS = {
 };
 
 function WholookModel(options,data) {
-	if ( typeof options === "Object")
+	if ( typeof options === "object")
  		this.options = $.extend(true,{},__WHOLOOK_MODEL_DEFAULT_OPTIONS, options);
  	else 
  		this.options = $.extend(true,{},__WHOLOOK_MODEL_DEFAULT_OPTIONS,__WHOLOOK_BUILTIN_MODEL[options]);
@@ -281,7 +281,7 @@ WholookModel.prototype.load = function(from, success, error) {
 		
 	// check local data availability
 	if ( from === "auto" && 
-		storage_model != null &&
+		storage_model &&
 		localStorage[storage_key] ) {
 		
 		var local = localStorage[storage_key];
@@ -371,7 +371,7 @@ WholookModel.prototype.loadFromServer = function(success, error) {
 				}
 				
 				// save to local
-				if ( model.options.storage.model != null ) {
+				if ( model.options.storage.model ) {
 					localStorage[model._getStorageKey()] = JSON.stringify({
 						timestamp: timestamp,
 						data: model.data,
@@ -564,13 +564,13 @@ function WholookLoader(args) {
 		this.options = $.extend({},__wholook_loader_default_options, args);
 	}
 	
-	var loader = this;
+	var self = this;
 	// string to model instance
-	$.each(this.options.models, function(idx,model) {
+	$.each(self.options.models, function(idx,model) {
 		if ( model instanceof WholookModel ) {
 
 		} else if ( typeof model === 'string' ) {
-			loader.options.models[idx] = new WholookModel(__WHOLOOK_BUILTIN_MODEL[model]);
+			self.options.models[idx] = new WholookModel(__WHOLOOK_BUILTIN_MODEL[model]);
 		} else {
 			console.error('ignore: '+model);
 		}
@@ -598,27 +598,27 @@ WholookLoader.prototype.filter = function(filter) {
 
 // internal only
 WholookLoader.prototype._loadLoop = function(index, from) {
-
+	var self = this;
 	// progress
-	if (index >= this.options.models.length) {
+	if (index >= self.options.models.length) {
 		
-		this.loaded=true;
+		self.loaded=true;
 		
-		if ( this.options.onComplete != null ) 
-			this.options.onComplete();
+		if ( self.options.onComplete ) 
+			self.options.onComplete();
 	} else {
-		var target = this.options.models[index];
-		if ( this.options.onProgress != null )
-			this.options.onProgress((100 / this.options.models.length * index), target);
+		var target = self.options.models[index];
+		if ( self.options.onProgress )
+			self.options.onProgress((100 / self.options.models.length * index), target);
 
-		var loop = this;
 		var next_index = index + 1;
 
 		target.load(from, function(data) {
-				loop._loadLoop(next_index, from);
+				self._loadLoop(next_index, from);
 			},function(error) {
-				if ( this.options.onError != null )
-					this.options.onError(error);
+				if ( self.options.onError )
+					self.options.onError(error);
+				console.error('[WholookLoader] Loading error : '+error.status);
 			});
 	}
 	

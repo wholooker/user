@@ -61,7 +61,7 @@
 				document.addEventListener("resume", onResume, false);
 				document.addEventListener("menubutton", onMenuKeyDown, false);
 				
-				navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
+				//navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
 				checkConnection();
 				
 	        	
@@ -86,7 +86,7 @@
    -->
      
     <!-- loader --> 
-    <div id="loading" class="loader" style="display:none;">
+    <div id="loading" class="loader" style="display:hidden;">
         <div class="status_custom">
         </div>
     </div>
@@ -207,6 +207,8 @@
         var messageObj; 
         var smsCount = 0;
         var firstStepCount = 0;
+        
+        
         
     	function refresh_ui_list(){
     		alert("업데이트중...");

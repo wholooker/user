@@ -4,7 +4,7 @@ var _WHOLOOK_USER_GUEST_ID_ = __WHOLOOK_STORAGE_PREFIX_ + "guest_id";
 
 
 // UserApp 에서 사용될 wholookModel define
-	
+
 var	invitelist = new WholookModel({
 	url: server_url + '/api/guest/invite/',
 	//data: 요청시 같이 전달될 데이터
@@ -36,7 +36,17 @@ var	msglist = new WholookModel({
 	//onLoading : function(){},
 	//onLoaded: function(){},
 });
-	
+var loader = null;
+function loadModelData(progress, complete) {
+	loader = new WholookLoader({
+		models:[invitelist,msglist],
+		onProgress: progress,
+		onComplete: complete,
+	});
+	loader.load();
+}
+
+/*
 var	loader = new WholookLoader({
 	models:[invitelist,msglist],
 	onProgress: function( percent, model ){
@@ -54,7 +64,7 @@ function modelLoading( action )
 {
 	console.log( "==========WholookLoader loading start ========================");
 	loader.load( 'auto'
-		/*
+		
 		,function() {
 			console.log( "==========WholookLoader loading.....========================");
 		    if ( action == 'SHOP_LIST_REG' )
@@ -66,12 +76,12 @@ function modelLoading( action )
 		    console.log("===========WholookLoader loading error===========");
 		    appClose()
 		}
-		//*/
+		
 	);
 	console.log("===========WholookLoader loading 완료===========");
 	showshoplist_reg();
 }
-
+*/
 // 로컬 스토어지에 있는 json data 를 object로 변환
 function getLocalToObjlist( storageName )
 {

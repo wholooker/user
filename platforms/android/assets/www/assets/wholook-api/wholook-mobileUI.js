@@ -87,7 +87,7 @@ function user_register(){
                     $(".status_custom").html(template(messageObj)); 
                     
         			$("#btnModalConfirm").click(function(){
-                       
+                       $("#loading").hide();
                       	var sendData =null;
 		
 						sendData = { 
@@ -152,7 +152,8 @@ function user_register(){
                 	
                     template = Handlebars.templates['modalConfirm'];
                     $(".status_custom").html(template(messageObj)); 
-                            
+                    $("#loading").show();
+                    
                     $("#btnModalConfirm").click(function(){
                        	$("#loading").hide();
                       	appClose()();
@@ -171,10 +172,10 @@ function user_register(){
                             title:'SMS인증 요청 에러',
                             text:'서버에서 인증번호를 보낼수 없습니다. 휴대폰의 상태를 확인후 다시 시도하십시요.'
            	    };
-            	//$("#loading").hide();
+            	
                 template = Handlebars.templates['modalConfirm'];
                 $(".status_custom").html(template(messageObj)); 
-                        
+                $("#loading").show();    
                 $("#btnModalConfirm").click(function(){
                    $("#loading").hide();
                    appClose();
@@ -188,7 +189,7 @@ function user_register(){
 // 로그인&업데이트 모듈
 function user_UpdateLogIn(){
 	
-	
+	$("#loading").hide();
 	template = Handlebars.templates['setIdentificationNo'];
 
     $("#content").html(template);
@@ -264,9 +265,9 @@ function user_UpdateLogIn(){
 		       	    	
 		       	    	template = Handlebars.templates['modalConfirm'];
 		            	$(".status_custom").html(template(messageObj)); 
-		            	
+		            	$("#loading").show();
 		            	$("#btnModalConfirm").click(function(){
-			            	//$("#loading").hide();
+			            	$("#loading").hide();
 			            	smsCount = 0;
 			               	user_register();
 						});		
@@ -280,9 +281,9 @@ function user_UpdateLogIn(){
 		       	    	
 		       	    	template = Handlebars.templates['modalConfirm'];
 		            	$(".status_custom").html(template(messageObj)); 
-		            	
+		            	$("#loading").show();
 		            	$("#btnModalConfirm").click(function(){
-			            	//$("#loading").hide();
+			            	$("#loading").hide();
 			               
 			               	user_UpdateLogIn();
 						});		
@@ -298,6 +299,7 @@ function user_UpdateLogIn(){
     			//기존 고객일때?
     			console.log( jqXHR.responseText );
     			console.log( " SMS인증 완전 에러 ");
+    			$("#loading").hide();
     			appClose();
     		}
     	});
@@ -308,7 +310,7 @@ function user_UpdateLogIn(){
 }
 //로그인 모듈
 function user_LogIn( guest ){
-	
+	$("#loading").hide();
 	sendData = {
 		"guest_id" : guest
 	};
@@ -323,6 +325,7 @@ function user_LogIn( guest ){
 				case 0:
 					console.log( " =======log in 성공 =======");
 					logIn_success( guest );
+					break;
 				//없는 게스트 아이
 				case 1:
 					console.log( " =======log in 에러 에러코드 1 =======");
@@ -332,7 +335,7 @@ function user_LogIn( guest ){
         			};
         			template = Handlebars.templates['modalConfirm'];
                     $(".status_custom").html(template(messageObj)); 
-                    
+                    $("#loading").show();
         			$("#btnModalConfirm").click(function(){
                        	$("#loading").hide();
                       	removeGuestID();
@@ -351,19 +354,25 @@ function user_LogIn( guest ){
 		}
     });
 }
-
+function onLoadProgressed(){
+	$("#loading").show();
+}
 
 function logIn_success( guest ){
 	setLocalGuestID( guest );
 	console.log( "=========logIn_sucess id ==" + guest );	
-	modelLoading( 'SHOP_LIST_REG' );
+	loadModelData(onLoadProgressed, showshoplist_reg);
 }
 
 function showshoplist_reg(){
 	
+	
+	console.log( invitelist );
+	
 	var template = Handlebars.templates['shoplistInfo'];
 	var html = template(invitelist);
-				
+	
+	$("#loading").hide();
 	$("#content").html(html);  
     set_back_btn( false,'');
 }
@@ -383,7 +392,7 @@ function showShopInfo( biz_id )
 	
 	$("#content").html(html);
 	
-	set_back_btn( true,'LOGIN_AFTER');
+	set_back_btn( true,'SHOP_LIST_REG');
 	
 	
 }
