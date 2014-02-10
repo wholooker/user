@@ -44,10 +44,10 @@
 		
 		if( !isVisible )
 		{
-			$("#content-container").animate({"left":"-=270px"}, {
+			$("#content-container").animate({"left":"-=260px"}, {
 		        duration: 100,
 		        step: function(left) {
-		            if (left == -270) {
+		            if (left == -260) {
 		                $("#content-container").stop();
 		                isVisible = true;	
 		            }
@@ -56,7 +56,7 @@
 			
 		}else
 		{
-			$("#content-container").animate({"left":"+=270px"}, {
+			$("#content-container").animate({"left":"+=260px"}, {
 		        duration: 100,
 		        step: function(left) {
 		            if (left == 0) { // stop at ~70

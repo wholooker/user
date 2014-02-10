@@ -1,29 +1,4 @@
 
-
-function buildShopImageFlip() {
-
-    $('.sponsorFlip').bind("click",function(){
-        var elem = $(this);
-       
-        if(elem.data('flipped'))
-        {
-            elem.revertFlip();
-            elem.data('flipped',false)
-        }
-        else
-        {
-            elem.flip({
-                direction:'lr',
-                speed: 350,
-                onBefore: function(){
-                    elem.html(elem.siblings('.sponsorData').html());
-                }
-            });
-            elem.data('flipped',true);
-        }
-   });  
-}
-
 var userVo = new UserVo(); 
 var template = null; 
 var temlpate_data = null;
@@ -49,7 +24,7 @@ function user_register(){
     // 인증번호 발송 
     $("#frmID > #btnSubmit").click(function(){ 
     	
-
+    	
         if($("#phoneno").val() == "") {
             alert("핸드폰번호를 입력해주십시오.");
             $("#phoneno").focus();
@@ -62,7 +37,6 @@ function user_register(){
             return; 
         }
         
-        
         userVo.phone = $("#phoneno").val();
         userVo.guestName = $("#name").val();
         
@@ -73,8 +47,6 @@ function user_register(){
         sendData = {
             'phone': userVo.phone
         };
-        
-        
         
         template = Handlebars.templates['modalLoading'];
         temlpate_data = {loading_text:'인증번호를 SMS로 전송중입니다.'};
@@ -201,7 +173,6 @@ function user_register(){
         });
        
     });
-    
     //console.log( " user_register 나감");
 }
 
@@ -250,9 +221,7 @@ function user_UpdateLogIn(){
         $("#loading").show();
         
         userVo.smsKey = $("#certiNum").val(); 
-        
         smsCount+=1;
-        
 		var sendData = null;
 	
     	sendData = { 
@@ -260,7 +229,7 @@ function user_UpdateLogIn(){
 				'name' : userVo.guestName, 
 				'phone' : userVo.phone, 
 				'sms_key' : userVo.smsKey, 
-				'device_type' : 'A',
+				'device_type' : getDeviceType(),
 				'push_key' : "pushkey",
 				'force' : true
 		};
@@ -279,21 +248,15 @@ function user_UpdateLogIn(){
     			$("#loading").hide();
     			if( json.result == 0 ){
     				// sms 인증후 약관동의 화면
-    				
     				console.log( "agreement ");
-    				
     				template = Handlebars.templates['agreement'];
     				
     			    $("#content").html(template);
     			    $("#agree1, #agree2").click(function() {
     			    	
-    			    	if( $("#agree1").is(":checked") &&  $("#agree2").is(":checked") )
-    			    	{
-    			    		logIn_success( userVo.guestId );
-    			    	}
+    			    	if( $("#agree1").is(":checked") &&  $("#agree2").is(":checked") )logIn_success( userVo.guestId );
+    			    
     			    });
-    				
-    				
     			}else if( json.result == 1){
     				//없는 guest id	
     				console.log( " guest update 에러 나올수 없는 에러 로직 에러");
@@ -351,9 +314,7 @@ function user_UpdateLogIn(){
     		}
     	});
         
-    }); 
-    
-	
+    });
 }
 //로그인 모듈
 function user_LogIn( guest ){
@@ -413,9 +374,9 @@ function logIn_success( guest ){
 
 function showshoplist_reg(){
 	
-	
 	console.log( invitelist );
-	
+	$("#menu_all").css("visibility","visible");
+	//$("#menu_all").css( "display", "show" );
 	var template = Handlebars.templates['shoplistInfo'];
 	var html = template(invitelist);
 	
@@ -440,6 +401,5 @@ function showShopInfo( biz_id )
 	$("#content").html(html);
 	
 	set_back_btn( true,'SHOP_LIST_REG');
-	
-	
 }
+

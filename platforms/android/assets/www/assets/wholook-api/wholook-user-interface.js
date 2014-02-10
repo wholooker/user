@@ -3,6 +3,39 @@ var server_url = 'http://dev.wholook.net';
 var _WHOLOOK_USER_GUEST_ID_ = __WHOLOOK_STORAGE_PREFIX_ + "guest_id";
 
 
+
+var app = {
+    // Application Constructor
+    initialize: function() {
+        this.bindEvents();
+    },
+    // Bind Event Listeners
+    //
+    // Bind any events that are required on startup. Common events are:
+    // 'load', 'deviceready', 'offline', and 'online'.
+    bindEvents: function() {
+        document.addEventListener('deviceready', this.onDeviceReady, false);
+		//navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationonError);
+    },
+    // deviceready Event Handler
+    //
+    // The scope of 'this' is the event. In order to call the 'receivedEvent'
+    // function, we must explicity call 'app.receivedEvent(...);'
+    onDeviceReady: function() {
+    	//*
+    	document.addEventListener("offline", onOffline, false);
+		document.addEventListener("online", onOnline, false);
+		document.addEventListener("backbutton", onBackKeyDown, false);
+
+        app.receivedEvent('deviceready');
+		
+    },
+    // Update DOM on a Received Event
+    receivedEvent: function(id) {
+        startGUI();
+    }
+};
+		
 // UserApp 에서 사용될 wholookModel define
 
 var	invitelist = new WholookModel({
@@ -46,42 +79,6 @@ function loadModelData(progress, complete) {
 	loader.load();
 }
 
-/*
-var	loader = new WholookLoader({
-	models:[invitelist,msglist],
-	onProgress: function( percent, model ){
-		console.log( "==========WholookLoader Define onProgress.========================");
-		//$("#loading").show();
-	},
-	onComplete: function() {
-		//$("#loading").hide();
-		console.log( "==========WholookLoader Define onComplete.....========================");
-	}
-});
-
-
-function modelLoading( action )
-{
-	console.log( "==========WholookLoader loading start ========================");
-	loader.load( 'auto'
-		
-		,function() {
-			console.log( "==========WholookLoader loading.....========================");
-		    if ( action == 'SHOP_LIST_REG' )
-		    {
-		    	showshoplist_reg();
-		    }
-		}
-		,function() {
-		    console.log("===========WholookLoader loading error===========");
-		    appClose()
-		}
-		
-	);
-	console.log("===========WholookLoader loading 완료===========");
-	showshoplist_reg();
-}
-*/
 // 로컬 스토어지에 있는 json data 를 object로 변환
 function getLocalToObjlist( storageName )
 {
@@ -162,6 +159,10 @@ function getUsim(){
 function getDeviceType(){
 	
 	//'A' or 'I' 만 리턴 해야 됨
+	
+	var temp = (device.platform).substr(0,1).toUpperCase();
+	console.log( "======platform========" + device.platform + "====="+ temp );
+	//return temp;
 	return 'A';
 }
 
@@ -189,28 +190,28 @@ function onBackKeyDown() {
 		click_back_btn();	
 	}else
 	{
-		/*
+		//*
 		navigator.notification.confirm(
             '앱을 종료 하시겠습니까?', // message
              onBackEnd,            // callback to invoke with index of button pressed
             'Game Over',           // title
             ['예','아니오']         // buttonLabels
         );	
-        */
+        //*/
 	}
 	
 }
 
 function onPause() {
-	alert("onPause");
+	//alert("onPause");
 }
 
 function onResume() {
-	alert("onResume");
+	//alert("onResume");
 }
 
 function onMenuKeyDown() {
-	alert("onMenuKeyDown");	
+	//alert("onMenuKeyDown");	
 }
 
 function getLocationSuccess( position ){
@@ -235,40 +236,36 @@ function getLocationonError( err ){
 function checkConnection() {
 	
 	// 테스트시 제대로 동작하지 않음 Unknown connection 으로 읽어 오는 경우가 허다함
-	/*
-	var networkState = navigator.connection.type;		
-	// cordova 2.3 before Connetion after navigator.connection
+	// 완변하게 테스트 후 컨넥션 종류에 따라 필요시 처리 처음에는 온|오프 라인만 체크
 	
+	// cordova 2.3 after Connetion after navigator.connection
+	//var networkState = navigator.network.connection.type;
+	var networkState = navigator.connection.type;
+			
     var states = {};
-    states[navigator.connection.UNKNOWN]  = 'Unknown connection';
-    states[navigator.connection.ETHERNET] = 'Ethernet connection';
-    states[navigator.connection.WIFI]     = 'WiFi connection';
-    states[navigator.connection.CELL_2G]  = 'Cell 2G connection';
-    states[navigator.connection.CELL_3G]  = 'Cell 3G connection';
-    states[navigator.connection.CELL_4G]  = 'Cell 4G connection';
-    states[navigator.connection.CELL]     = 'Cell generic connection';
-    states[navigator.connection.NONE]     = 'No network connection';
+   
+    states[Connection.UNKNOWN]  = 'Unknown connection';
+    states[Connection.ETHERNET] = 'Ethernet connection';
+    states[Connection.WIFI]     = 'WiFi connection';
+    states[Connection.CELL_2G]  = 'Cell 2G connection';
+    states[Connection.CELL_3G]  = 'Cell 3G connection';
+    states[Connection.CELL_4G]  = 'Cell 4G connection';
+    states[Connection.CELL]     = 'Cell generic connection';
+    states[Connection.NONE]     = 'No network connection';
 	
-
+	
 	console.log( "Network State=======" + states[networkState] );
+	/*
     if( states[networkState] != 'No network connection' )
-    	Network_State = true;
-    
-    //devicePlatform = cordova.device.model;
-
-    console.log( "devicePlatform====" + cordova.device );
-   	
-   	var deviceInfo = 'Device Name: '     + device.name     + '/n' +
-                    'Device Model: '    + device.model    + '/n' +
-                    'Device Cordova: '  + device.cordova  + '/n' +
-                    'Device Platform: ' + device.platform + '/n' +
-                    'Device UUID: '     + device.uuid     + '/n' +
-                    'Device Version: '  + device.version  + '/n';
-   	
-   	
-   	console.log( "deviceInfo====" + deviceInfo );
-   	*/
-   	Network_State = true;
+    {
+    	Network_State = true;	
+    }else
+    {
+    	Network_State = false;	
+    }
+    */
+   
+   	Network_State = navigator.onLine;
 }
 	          	
 //el = 결과값 보여줄 element		
